@@ -6,7 +6,7 @@ tags = {
 
   Project     = "OpenProject + DevLake"
 
-  Owner       = "Lavanya"
+  Owner       = "Barath"
 
   Name        = "Infra"
 
