@@ -71,3 +71,8 @@ jobs:
             $0 ~ end { print; printDocs = 1; next }
             printDocs { print }
           ' README.md > README.tmp && mv README.tmp README.md
+      
+      - name: Run Checkov Scan
+         run:|
+            checkov -d . --quiet --compact --framework terraform
+
