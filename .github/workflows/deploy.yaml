@@ -1,0 +1,33 @@
+name: Provision Infra using Terraform via EC2
+on:
+  workflow_dispatch:
+  
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  provision:
+    name: Terraform Infra via EC2
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+ 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::650251701672:role/s3-github
+          aws-region: us-east-2
+ 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          
+      - name: Terraform formtat (Create EC2)
+        run: terraform fmt
+        
+      - name: Terraform init (Create EC2)
+        run: terraform init
