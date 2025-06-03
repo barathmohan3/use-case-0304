@@ -31,3 +31,6 @@ jobs:
         
       - name: Terraform init (Create EC2)
         run: terraform init
+
+      - name: Terraform plan (Create EC2)
+        run: terraform plan
