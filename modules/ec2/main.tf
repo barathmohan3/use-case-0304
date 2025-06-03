@@ -68,3 +68,37 @@ resource "aws_instance" "devlake" {
    Name = "${lookup(var.tags, "Name", "default")}-DevLake"
  })
 }
+
+resource "aws_instance" "openproject" {
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_1
+  vpc_security_group_ids = [var.sg_id]
+  associate_public_ip_address = true
+
+  user_data = <<-EOT
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y docker.io
+    systemctl start docker
+    systemctl enable docker
+    docker run -dit -p 80:80 -e OPENPROJECT_SECRET_KEY_BASE=secret -e OPENPROJECT_HOST__NAME=0.0.0.0:80 -e OPENPROJECT_HTTPS=false openproject/community:12Add commentMore actions
+  EOT
+
+  tags = merge(var.tags, {
+    Name = "${lookup(var.tags, "Name", "default")}-OpenProject"
+  })
+}
+
+resource "aws_lb_target_group_attachment" "openproject_attach" {
+  target_group_arn = var.openproject_tg_arn
+  target_id        = aws_instance.openproject.idAdd
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "devlake_attach" {
+  target_group_arn = var.devlake_tg_arn
+  target_id        = aws_instance.devlake.id
+  port             = 4000
+}
+
