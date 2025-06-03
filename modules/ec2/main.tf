@@ -84,7 +84,7 @@ resource "aws_instance" "devlake" {
     EOF
     # Start containers
     docker-compose up -d
-  EOT
+  EOF
   tags = merge(var.tags, {
     Name = "${lookup(var.tags, "Name", "default")}-DevLake"
   })
