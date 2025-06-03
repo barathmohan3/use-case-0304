@@ -45,7 +45,6 @@ jobs:
       - name: Terraform plan
         run: terraform plan
 
-      # ➕ Conditional apply or destroy
       - name: Terraform Apply or Destroy
         run: |
           if [[ "${{ github.event.inputs.action }}" == "destroy" ]]; then
@@ -54,13 +53,21 @@ jobs:
             terraform apply -auto-approve
           fi
 
-      # 📚 Install terraform-docs
       - name: Install terraform-docs
         run: |
           curl -sSLo terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           sudo mv terraform-docs /usr/local/bin/
 
-      # 📝 Generate markdown doc
-      - name: Generate Terraform Docs
-        run: terraform-docs markdown table . > TERRAFORM_DOCS.md
+      - name: Update Terraform Docs in README.md
+        run: |
+          START_MARKER="<!-- BEGIN_TF_DOCS -->"
+          END_MARKER="<!-- END_TF_DOCS -->"
+          DOCS=$(terraform-docs markdown table .)
+
+          awk -v start="$START_MARKER" -v end="$END_MARKER" -v docs="$DOCS" '
+            BEGIN { printDocs = 1 }
+            $0 ~ start { print; print docs; printDocs = 0; next }
+            $0 ~ end { print; printDocs = 1; next }
+            printDocs { print }
+          ' README.md > README.tmp && mv README.tmp README.md
