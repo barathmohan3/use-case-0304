@@ -92,7 +92,7 @@ resource "aws_instance" "openproject" {
 
 resource "aws_lb_target_group_attachment" "openproject_attach" {
   target_group_arn = var.openproject_tg_arn
-  target_id        = aws_instance.openproject.idAdd
+  target_id        = aws_instance.openproject.id
   port             = 80
 }
 
